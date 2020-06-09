@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.generic import (
-    ListView, DetailView, CreateView, UpdateView)
+    ListView, DetailView, CreateView, UpdateView, DeleteView)
 from .models import Post
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
@@ -20,6 +20,16 @@ class PostListView(ListView):
 
 class PostDetailView(DetailView):
     model = Post
+
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Post
+    success_url = '/'
+    
+    def test_func(self):
+        post = self.get_object()
+        if self.request.user == post.author:
+            return True
+        return False
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
